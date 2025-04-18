@@ -1,17 +1,18 @@
-# ✅ Use official Playwright image with Chromium pre-installed
-FROM mcr.microsoft.com/playwright:v1.52.0-jammy
+# Use official Playwright base image with all dependencies
+FROM mcr.microsoft.com/playwright:v1.42.1-jammy
 
-# ✅ Set working directory
+# Set working directory
 WORKDIR /app
 
-# ✅ Copy all files
-COPY . .
-
-# ✅ Install Node.js dependencies
+# Copy package.json and install dependencies first (for caching)
+COPY package.json package-lock.json* ./
 RUN npm install
 
-# ✅ Expose the port your app runs on
+# Copy remaining project files
+COPY . .
+
+# Expose the port your app runs on
 EXPOSE 3000
 
-# ✅ Start your Node.js app
-CMD ["node", "api.js"]
+# Start your app
+CMD ["npm", "start"]
