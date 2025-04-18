@@ -1,25 +1,17 @@
-# Use the official Playwright image with Chromium installed
+# ✅ Use official Playwright image with Chromium pre-installed
 FROM mcr.microsoft.com/playwright:v1.52.0-jammy
 
-# Install necessary dependencies for running Chromium
-RUN apt-get update && apt-get install -y \
-  libnss3 libatk-bridge2.0-0 libatk1.0-0 libx11-xcb1 libxcomposite1 libxrandr2 \
-  libgbm1 libasound2 libnspr4
-
-# Set the working directory inside the container
+# ✅ Set working directory
 WORKDIR /app
 
-# Copy the current directory's contents into the container's working directory
+# ✅ Copy all files
 COPY . .
 
-# Install application dependencies
+# ✅ Install Node.js dependencies
 RUN npm install
 
-# Ensure Playwright installs its required browser binaries
-RUN npx playwright install
-
-# Expose port 3000 for the application
+# ✅ Expose the port your app runs on
 EXPOSE 3000
 
-# Define the command to start your application
-CMD ["npm", "start"]
+# ✅ Start your Node.js app
+CMD ["node", "api.js"]
