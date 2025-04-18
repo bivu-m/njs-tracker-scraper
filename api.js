@@ -1,26 +1,30 @@
 const express = require("express");
-const cors = require("cors");  // <-- Import CORS
-const scraper = require("./scraper");
+const cors = require("cors");
+const scrape = require("./scraper");
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Enable CORS for all origins (you can customize this if needed)
 app.use(cors());
+app.use(express.json());
 
-app.get("/api/track", async (req, res) => {
-  const { courier, trackingId } = req.query;
-  if (!courier || !trackingId) return res.status(400).json({ error: "Missing courier or trackingId" });
+// Add this route for root
+app.get("/", (req, res) => {
+  res.send("✅ NJS Tracker Scraper is live!");
+});
+
+// Tracking API
+app.post("/track", async (req, res) => {
+  const { courier, trackingId } = req.body;
 
   try {
-    const data = await scraper(courier, trackingId);
-    res.json({ status: "success", data });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ status: "failed", error: err.message });
+    const result = await scrape(courier, trackingId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
