@@ -29,4 +29,15 @@ module.exports = async function (courier, trackingId) {
         deliveryAt: getText("div:has-text('Delivered At') + div"),
         bookedOn: getText("div:has-text('Booked On') + div"),
         deliveryLocation: getText("div:has-text('Delivery Location') + div"),
-        fullHtml:
+        fullHtml: document.documentElement.innerHTML,  // Extract the full HTML content
+      };
+    });
+
+    await browser.close();
+    return data;
+
+  } catch (error) {
+    await browser.close();
+    throw new Error("Error while scraping the data: " + error.message);
+  }
+};
