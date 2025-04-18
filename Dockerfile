@@ -15,6 +15,9 @@ COPY . .
 # Install application dependencies
 RUN npm install
 
+# Ensure Playwright installs its required browser binaries
+RUN npx playwright install
+
 # Expose port 3000 for the application
 EXPOSE 3000
 
