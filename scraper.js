@@ -1,20 +1,42 @@
 const playwright = require("playwright");
 
 module.exports = async function (courier, trackingId) {
-  const url = `https://www.aftership.com/track/${courier}/${trackingId}`;
+  // Use India Post's tracking URL
+  const url = `https://www.indiapost.gov.in/VAS/Pages/tracking.aspx`;
 
+  // Launch the browser
   const browser = await playwright.chromium.launch({ headless: true });
   const context = await browser.newContext();
- const page = await context.newPage();
-await page.goto(url, { waitUntil: "load", timeout: 60000 });
-return page;
+  const page = await context.newPage();
 
+  // Navigate to the India Post tracking page
+  await page.goto(url, { waitUntil: "load", timeout: 60000 });
 
+  // Type the consignment number into the tracking input field
+  await page.fill('#ctl00_ContentPlaceHolder1_txtConsignment', trackingId);
 
-  // Sample output since the actual site uses shadow DOM and dynamic rendering
-  const content = await page.content();
+  // Click the "Track" button
+  await page.click('#ctl00_ContentPlaceHolder1_btnTrack');
+  
+  // Wait for the tracking information to load
+  await page.waitForSelector('.tracking_result', { timeout: 60000 });
+
+  // Scrape the relevant tracking information
+  const trackingData = await page.evaluate(() => {
+    const events = [];
+    const eventNodes = document.querySelectorAll('.event-details'); // Adjust this selector to match the actual event container
+    eventNodes.forEach((node) => {
+      events.push({
+        date: node.querySelector('.event-date') ? node.querySelector('.event-date').textContent : 'N/A',
+        status: node.querySelector('.event-status') ? node.querySelector('.event-status').textContent : 'N/A',
+        location: node.querySelector('.event-location') ? node.querySelector('.event-location').textContent : 'N/A'
+      });
+    });
+    return events;
+  });
 
   await browser.close();
 
-  return [{ detail: "Sample Status", date: "Today", location: "Sample Location" }];
+  // Return the scraped data
+  return trackingData;
 };
