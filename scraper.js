@@ -5,8 +5,10 @@ module.exports = async function (courier, trackingId) {
 
   const browser = await playwright.chromium.launch({ headless: true });
   const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto(url, { waitUntil: "load", timeout: 60000 });
+ const page = await context.newPage();
+await page.goto(url, { waitUntil: "load", timeout: 60000 });
+return page;
+
 
 
   // Sample output since the actual site uses shadow DOM and dynamic rendering
